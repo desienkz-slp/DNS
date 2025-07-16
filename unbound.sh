@@ -144,7 +144,7 @@ server:
   hide-version: yes
   prefetch: yes
   cache-max-ttl: 86400
-  cache-min-ttl: 3600
+  cache-min-ttl: 30
   qname-minimisation: yes
   log-queries: yes
   log-replies: yes
