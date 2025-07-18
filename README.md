@@ -6,3 +6,4 @@ List isi setting
   4. local-data: "isolir.sornongko.net. A 172.18.20.20"
   5. local-data: "acs.sornongko.net. A 172.18.20.233"
   6. local-data: "wa-gate.sornongko.net. A 172.18.20.241"
+  7. port unbound 9168
