@@ -89,7 +89,7 @@ sudo wget https://raw.githubusercontent.com/hagezi/dns-blocklists/main/hosts/mul
 cat <<EOF | sudo tee /etc/unbound/blocklist/update-lists.sh
 #!/bin/bash
 curl -s https://raw.githubusercontent.com/ABPindo/indonesianadblockrules/master/subscriptions/abpindo.txt -o /etc/unbound/blocklist/block-ads.txt
-curl -s https://raw.githubusercontent.com/hagezi/dns-blocklists/main/hosts/multi-compressed.txt -o /etc/unbound/blocklist/block-malware.txt
+curl -s https://filters.adtidy.org/extension/chromium/filters/15.txt -o /etc/unbound/blocklist/block-malware.txt
 EOF
 sudo chmod +x /etc/unbound/blocklist/update-lists.sh
 sudo /etc/unbound/blocklist/update-lists.sh
@@ -97,11 +97,35 @@ sudo /etc/unbound/blocklist/update-lists.sh
 # Script blok iklan & malware
 cat <<EOF | sudo tee /etc/unbound/blocklist/gen-block.conf.sh
 #!/bin/bash
-OUT="/etc/unbound/blocklist/ad-malware-block.conf"
-> "\$OUT"
 
-grep "^0.0.0.0" /etc/unbound/blocklist/block-ads.txt | awk '{print "local-zone: \""\$2"\" static"}' >> "\$OUT"
-cat /etc/unbound/blocklist/block-malware.txt | grep -v "^#" | awk '{print "local-zone: \""\$1"\" static"}' >> "\$OUT"
+OUT="/etc/unbound/blocklist/ad-malware-block.conf"
+TMP="/tmp/adblock-clean.tmp"
+
+> "$TMP"
+
+# Proses file iklan (jika pakai format Adblock)
+cat /etc/unbound/blocklist/block-ads.txt | \
+  grep '^||' | sed -E 's/^\|\|([^\/\^\$]+).*/\1/' | \
+  sort -u | awk '{print "local-zone: \""$1"\" static"}' >> "$TMP"
+
+# Proses file malware (juga format Adblock)
+cat /etc/unbound/blocklist/block-malware.txt | \
+  grep '^||' | sed -E 's/^\|\|([^\/\^\$]+).*/\1/' | \
+  sort -u | awk '{print "local-zone: \""$1"\" static"}' >> "$TMP"
+
+# Hapus duplikat
+awk '!x[$0]++' "$TMP" > "$OUT"
+rm "$TMP"
+
+# Tes konfigurasi
+if unbound-checkconf; then
+    systemctl restart unbound
+    echo "✅ Blocklist updated & Unbound restarted."
+else
+    echo "❌ Config error! Please check manually."
+    head -n 10 "$OUT"
+fi
+
 EOF
 sudo chmod +x /etc/unbound/blocklist/gen-block.conf.sh
 sudo /etc/unbound/blocklist/gen-block.conf.sh
