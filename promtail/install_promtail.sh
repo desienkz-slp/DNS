@@ -4,20 +4,21 @@ set -e
 
 PROMTAIL_VERSION="3.5.2"
 INSTALL_DIR="/usr/local/bin"
-CONFIG_DIR="/etc/"
+CONFIG_DIR="/etc/promtail"
 SERVICE_FILE="/etc/systemd/system/promtail.service"
+CONFIG_FILE="$CONFIG_DIR/promtail.yaml"
 
 # Unduh dan ekstrak Promtail
 echo "📥 Mengunduh Promtail versi $PROMTAIL_VERSION..."
-curl -sL -o /tmp/promtail.tar.gz "https://github.com/grafana/loki/releases/download/v$PROMTAIL_VERSION/promtail-linux-amd64.zip"
+curl -sL -o /tmp/promtail.zip "https://github.com/grafana/loki/releases/download/v$PROMTAIL_VERSION/promtail-linux-amd64.zip"
 
-# Instal unzip jika belum ada
+# Instal unzip jika belum tersedia
 if ! command -v unzip &>/dev/null; then
   echo "📦 Menginstal unzip..."
   apt update && apt install -y unzip
 fi
 
-unzip -o /tmp/promtail.tar.gz -d /tmp/
+unzip -o /tmp/promtail.zip -d /tmp/
 chmod +x /tmp/promtail-linux-amd64
 mv /tmp/promtail-linux-amd64 "$INSTALL_DIR/promtail"
 
@@ -25,7 +26,7 @@ mv /tmp/promtail-linux-amd64 "$INSTALL_DIR/promtail"
 mkdir -p "$CONFIG_DIR"
 
 # Buat file konfigurasi dasar
-cat > "$CONFIG_DIR/promtail-config.yml" <<EOF
+cat > "$CONFIG_FILE" <<EOF
 server:
   http_listen_port: 9080
   grpc_listen_port: 0
@@ -57,7 +58,7 @@ Description=Promtail - sends logs to Loki
 After=network.target
 
 [Service]
-ExecStart=$INSTALL_DIR/promtail -config.file=$CONFIG_DIR/promtail-config.yml
+ExecStart=$INSTALL_DIR/promtail -config.file=$CONFIG_FILE
 Restart=on-failure
 
 [Install]
