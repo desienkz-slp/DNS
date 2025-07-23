@@ -1,35 +1,37 @@
 #!/bin/bash
 
-# Output file untuk Unbound
+# Output file
 OUT="/etc/unbound/blocklist/adult-redirect.conf"
 
 # IP tujuan redirect
 REDIRECT_IP="172.18.20.234"
 
-# Input file domain ABP-style
+# File input
 INPUT="/etc/unbound/blocklist/adult-domains.txt"
 
-# Kosongkan file output
+# Kosongkan output
 > "$OUT"
 
-# Proses setiap baris domain
-while read -r raw_domain; do
-  # Hilangkan whitespace
-  raw_domain=$(echo "$raw_domain" | xargs)
+# Gunakan associative array untuk deteksi duplikat
+declare -A domain_seen
 
-  # Lewati baris kosong
+while read -r raw_domain; do
+  raw_domain=$(echo "$raw_domain" | xargs)
   [ -z "$raw_domain" ] && continue
 
-  # Bersihkan domain dari karakter ABP: ||, ^, *.
+  # Bersihkan dari karakter ABP
   clean_domain=$(echo "$raw_domain" | sed -E 's/^\|\|//; s/\^$//; s/^\*\.\?//')
 
-  # Lewati jika setelah dibersihkan tetap kosong
-  [ -z "$clean_domain" ] && continue
+  # Lewati duplikat
+  if [[ -n "${domain_seen[$clean_domain]}" ]]; then
+    continue
+  fi
+  domain_seen[$clean_domain]=1
 
-  # Tulis ke file konfigurasi Unbound
+  # Tulis hanya jika unik
   echo "local-zone: \"$clean_domain.\" redirect" >> "$OUT"
   echo "local-data: \"$clean_domain. A $REDIRECT_IP\"" >> "$OUT"
   echo "local-data: \"www.$clean_domain. A $REDIRECT_IP\"" >> "$OUT"
 done < "$INPUT"
 
-echo "✅ File selesai dibuat: $OUT"
+echo "✅ File selesai dibuat tanpa duplikat: $OUT"
