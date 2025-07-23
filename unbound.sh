@@ -83,13 +83,13 @@ cd /etc/unbound/blocklist
 
 # Download blocklist
 sudo wget https://raw.githubusercontent.com/ABPindo/indonesianadblockrules/master/subscriptions/abpindo.txt -O /etc/unbound/blocklist/block-ads.txt
-sudo wget https://raw.githubusercontent.com/hagezi/dns-blocklists/main/hosts/multi-compressed.txt -O /etc/unbound/blocklist/block-malware.txt
+sudo wget  https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts -O /etc/unbound/blocklist/block-malware.txt
 
 # Script auto-update blocklist
 cat <<EOF | sudo tee /etc/unbound/blocklist/update-lists.sh
 #!/bin/bash
 curl -s https://raw.githubusercontent.com/ABPindo/indonesianadblockrules/master/subscriptions/abpindo.txt -o /etc/unbound/blocklist/block-ads.txt
-curl -s https://filters.adtidy.org/extension/chromium/filters/15.txt -o /etc/unbound/blocklist/block-malware.txt
+curl -s  https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts -o /etc/unbound/blocklist/block-malware.txt
 EOF
 sudo chmod +x /etc/unbound/blocklist/update-lists.sh
 sudo /etc/unbound/blocklist/update-lists.sh
@@ -98,32 +98,45 @@ sudo /etc/unbound/blocklist/update-lists.sh
 cat <<EOF | sudo tee /etc/unbound/blocklist/gen-block.conf.sh
 #!/bin/bash
 
+# Sumber data
+ADS_SRC="/etc/unbound/blocklist/block-ads.txt"
+MAL_SRC="/etc/unbound/blocklist/block-malware.txt"
+
+# Output konfigurasi Unbound
 OUT="/etc/unbound/blocklist/ad-malware-block.conf"
 TMP="/tmp/adblock-clean.tmp"
 
+# Kosongkan file sementara
 > "$TMP"
 
-# Proses file iklan (jika pakai format Adblock)
-cat /etc/unbound/blocklist/block-ads.txt | \
-  grep '^||' | sed -E 's/^\|\|([^\/\^\$]+).*/\1/' | \
-  sort -u | awk '{print "local-zone: \""$1"\" static"}' >> "$TMP"
+echo "🔁 Memproses daftar iklan (ABP format)..."
+grep '^||' "$ADS_SRC" | \
+  sed -E 's/^\|\|([^\/\^\$\*]+).*/\1/' | \
+  grep -Ev '^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$' | \
+  grep -Ev '[^a-zA-Z0-9.-]' | \
+  sort -u | \
+  awk '{print "local-zone: \""$1"\" static"}' >> "$TMP"
 
-# Proses file malware (juga format Adblock)
-cat /etc/unbound/blocklist/block-malware.txt | \
-  grep '^||' | sed -E 's/^\|\|([^\/\^\$]+).*/\1/' | \
-  sort -u | awk '{print "local-zone: \""$1"\" static"}' >> "$TMP"
+echo "🔁 Memproses daftar malware (hosts format)..."
+grep -E '^(0\.0\.0\.0|127\.0\.0\.1)' "$MAL_SRC" | \
+  awk '{print $2}' | \
+  grep -Ev '^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$' | \
+  grep -Ev '[^a-zA-Z0-9.-]' | \
+  sort -u | \
+  awk '{print "local-zone: \""$1"\" static"}' >> "$TMP"
 
-# Hapus duplikat
+# Hapus duplikat akhir
 awk '!x[$0]++' "$TMP" > "$OUT"
 rm "$TMP"
 
-# Tes konfigurasi
+echo "🔍 Mengecek konfigurasi Unbound..."
 if unbound-checkconf; then
+    echo "✅ Konfigurasi OK! Me-restart Unbound..."
     systemctl restart unbound
-    echo "✅ Blocklist updated & Unbound restarted."
+    echo "✅ Blocklist berhasil diperbarui & Unbound di-restart."
 else
-    echo "❌ Config error! Please check manually."
-    head -n 10 "$OUT"
+    echo "❌ ERROR: Cek manual isi blocklist yang error!"
+    grep '"' "$OUT" | grep -v 'local-zone' | head -n 10
 fi
 
 EOF
@@ -145,8 +158,6 @@ EOF
 
 cat <<EOF | sudo tee /etc/unbound/blocklist/adult-domains.txt
 pornhub.com
-xvideos.com
-xnxx.com
 EOF
 
 sudo chmod +x /etc/unbound/blocklist/gen-adult-block.sh
