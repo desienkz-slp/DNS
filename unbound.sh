@@ -110,20 +110,20 @@ TMP="/tmp/adblock-clean.tmp"
 > "$TMP"
 
 echo "🔁 Memproses daftar iklan (ABP format)..."
-grep '^||' "$ADS_SRC" | \
-  sed -E 's/^\|\|([^\/\^\$\*]+).*/\1/' | \
-  grep -Ev '^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$' | \
-  grep -Ev '[^a-zA-Z0-9.-]' | \
-  sort -u | \
-  awk '{print "local-zone: \""$1"\" static"}' >> "$TMP"
+grep '^||' "$ADS_SRC" \
+  | sed -E 's/^\|\|([^\/\^$\*]+).*/\1/' \
+  | grep -Ev '^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$' \
+  | grep -Ev '[^a-zA-Z0-9.-]' \
+  | sort -u \
+  | awk '{print "local-zone: \""$1"\" static"}' >> "$TMP"
 
 echo "🔁 Memproses daftar malware (hosts format)..."
-grep -E '^(0\.0\.0\.0|127\.0\.0\.1)' "$MAL_SRC" | \
-  awk '{print $2}' | \
-  grep -Ev '^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$' | \
-  grep -Ev '[^a-zA-Z0-9.-]' | \
-  sort -u | \
-  awk '{print "local-zone: \""$1"\" static"}' >> "$TMP"
+grep -E '^(0\.0\.0\.0|127\.0\.0\.1)' "$MAL_SRC" \
+  | awk '{print $2}' \
+  | grep -Ev '^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$' \
+  | grep -Ev '[^a-zA-Z0-9.-]' \
+  | sort -u \
+  | awk '{print "local-zone: \""$1"\" static"}' >> "$TMP"
 
 # Hapus duplikat akhir
 awk '!x[$0]++' "$TMP" > "$OUT"
@@ -231,6 +231,13 @@ EOF
 
 # === 7. Setup Remote Control Certificate ===
 sudo unbound-control-setup
+
+sudo rm /etc/resolv.conf
+sudo ln -s /run/systemd/resolve/resolv.conf /etc/resolv.conf
+
+sudo systemctl stop systemd-resolved
+sudo systemctl disable systemd-resolved
+
 
 # === 8. Aktifkan Unbound ===
 sudo systemctl restart unbound
