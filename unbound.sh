@@ -106,6 +106,12 @@ MAL_SRC="/etc/unbound/blocklist/block-malware.txt"
 OUT="/etc/unbound/blocklist/ad-malware-block.conf"
 TMP="/tmp/adblock-clean.tmp"
 
+# Pastikan file input ada
+if [[ ! -f "$ADS_SRC" || ! -f "$MAL_SRC" ]]; then
+    echo "❌ ERROR: File sumber $ADS_SRC atau $MAL_SRC tidak ditemukan!"
+    exit 1
+fi
+
 # Kosongkan file sementara
 > "$TMP"
 
@@ -115,7 +121,7 @@ grep '^||' "$ADS_SRC" \
   | grep -Ev '^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$' \
   | grep -Ev '[^a-zA-Z0-9.-]' \
   | sort -u \
-  | awk '{print "local-zone: \""$1"\" static"}' >> "$TMP"
+  | awk '{print "local-zone: \"" $1 "\" static"}' >> "$TMP"
 
 echo "🔁 Memproses daftar malware (hosts format)..."
 grep -E '^(0\.0\.0\.0|127\.0\.0\.1)' "$MAL_SRC" \
@@ -123,11 +129,11 @@ grep -E '^(0\.0\.0\.0|127\.0\.0\.1)' "$MAL_SRC" \
   | grep -Ev '^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$' \
   | grep -Ev '[^a-zA-Z0-9.-]' \
   | sort -u \
-  | awk '{print "local-zone: \""$1"\" static"}' >> "$TMP"
+  | awk '{print "local-zone: \"" $1 "\" static"}' >> "$TMP"
 
 # Hapus duplikat akhir
-awk '!x[$0]++' "$TMP" > "$OUT"
-rm "$TMP"
+sort -u "$TMP" > "$OUT"
+rm -f "$TMP"
 
 echo "🔍 Mengecek konfigurasi Unbound..."
 if unbound-checkconf; then
@@ -136,8 +142,9 @@ if unbound-checkconf; then
     echo "✅ Blocklist berhasil diperbarui & Unbound di-restart."
 else
     echo "❌ ERROR: Cek manual isi blocklist yang error!"
-    grep '"' "$OUT" | grep -v 'local-zone' | head -n 10
+    head -n 10 "$OUT"
 fi
+
 
 EOF
 sudo chmod +x /etc/unbound/blocklist/gen-block.conf.sh
