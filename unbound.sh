@@ -71,7 +71,7 @@ cd /etc/unbound/blocklist
 curl -L https://raw.githubusercontent.com/desienkz-slp/DNS/refs/heads/main/update-lists.sh -o /etc/unbound/blocklist/update-list.sh
 
 chmod +x /etc/unbound/blocklist/update-list.sh
-/etc/unbound/blocklist/update-list.sh
+bash /etc/unbound/blocklist/update-list.sh
 
 cat <<'EOF' > /etc/unbound/blocklist/gen-block.conf.sh
 #!/bin/bash
@@ -127,7 +127,7 @@ fi
 EOF
 
 chmod +x /etc/unbound/blocklist/gen-block.conf.sh
-/etc/unbound/blocklist/gen-block.conf.sh
+bash /etc/unbound/blocklist/gen-block.conf.sh
 
 cat <<'EOF' > /etc/unbound/blocklist/gen-adult-block.sh
 #!/bin/bash
@@ -146,7 +146,7 @@ pornhub.com
 EOF
 
 chmod +x /etc/unbound/blocklist/gen-adult-block.sh
-/etc/unbound/blocklist/gen-adult-block.sh
+bash /etc/unbound/blocklist/gen-adult-block.sh
 
 # === 6. Konfigurasi Unbound ===
 curl -L https://raw.githubusercontent.com/desienkz-slp/DNS/refs/heads/main/unbound.conf -o /etc/unbound/unbound.conf
