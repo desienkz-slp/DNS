@@ -3,10 +3,10 @@
 echo "🔁 Mengupdate daftar blocklist..."
 
 # Update daftar iklan
-curl -s https://raw.githubusercontent.com/ABPindo/indonesianadblockrules/master/subscriptions/abpindo.txt -o /etc/unbound/blocklist/block-ads.txt
+curl -s https://raw.githubusercontent.com/hagezi/dns-blocklists/main/adblock/popupads.txt -o /etc/unbound/blocklist/block-ads.txt
 
 # Update daftar malware
-curl -s https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts -o /etc/unbound/blocklist/block-malware.txt
+curl -s https://raw.githubusercontent.com/hagezi/dns-blocklists/main/hosts/light.txt -o /etc/unbound/blocklist/block-malware.txt
 
 # Update daftar domain dewasa
 curl -s https://raw.githubusercontent.com/alexsannikov/adguardhome-filters/refs/heads/master/porn.txt -o /etc/unbound/blocklist/adult-domains.txt
