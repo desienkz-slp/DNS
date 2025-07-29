@@ -68,7 +68,7 @@ systemctl enable --now cloudflared-google.service
 mkdir -p /etc/unbound/blocklist
 cd /etc/unbound/blocklist
 
-curl -s -H "Authorization: token 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" \
+curl -s -H "Authorization: token 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" \
   -L "https://raw.githubusercontent.com/desienkz-slp/DNS/main/update-list.sh" \
   -o /etc/unbound/blocklist/update-list.sh
 
@@ -151,7 +151,7 @@ chmod +x /etc/unbound/blocklist/gen-adult-block.sh
 /etc/unbound/blocklist/gen-adult-block.sh
 
 # === 6. Konfigurasi Unbound ===
-curl -s -H "Authorization: token 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" \
+curl -s -H "Authorization: token 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" \
   -L "https://raw.githubusercontent.com/desienkz-slp/DNS/main/unbound.conf" \
   -o /etc/unbound/unbound.conf
 
