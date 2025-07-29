@@ -82,8 +82,8 @@ sudo mkdir -p /etc/unbound/blocklist
 cd /etc/unbound/blocklist
 
 # Download blocklist
-sudo wget https://raw.githubusercontent.com/ABPindo/indonesianadblockrules/master/subscriptions/abpindo.txt -O /etc/unbound/blocklist/block-ads.txt
-sudo wget  https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts -O /etc/unbound/blocklist/block-malware.txt
+sudo wget https://raw.githubusercontent.com/hagezi/dns-blocklists/main/adblock/popupads.txt -O /etc/unbound/blocklist/block-ads.txt
+sudo wget https://raw.githubusercontent.com/hagezi/dns-blocklists/main/hosts/light.txt -O /etc/unbound/blocklist/block-malware.txt
 
 # Script auto-update blocklist
 cat <<EOF | sudo tee /etc/unbound/blocklist/update-lists.sh
