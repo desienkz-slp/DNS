@@ -12,6 +12,6 @@ curl -s https://raw.githubusercontent.com/hagezi/dns-blocklists/main/hosts/light
 curl -s https://raw.githubusercontent.com/alexsannikov/adguardhome-filters/refs/heads/master/porn.txt -o /etc/unbound/blocklist/adult-domains.txt
 
 # Update daftar tambahan dari kamu sendiri
-curl -s -H "Authorization: token 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"  -L "https://raw.githubusercontent.com/desienkz-slp/DNS/refs/heads/main/block_mine.txt"   -o /etc/unbound/blocklist/block-mine.txt
+curl -L https://raw.githubusercontent.com/desienkz-slp/DNS/refs/heads/main/update-lists.sh  -o /etc/unbound/blocklist/block-mine.txt
 
 echo "✅ Semua blocklist diperbarui!"
