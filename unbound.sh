@@ -90,6 +90,7 @@ cat <<EOF | sudo tee /etc/unbound/blocklist/update-lists.sh
 #!/bin/bash
 curl -s https://raw.githubusercontent.com/hagezi/dns-blocklists/main/adblock/popupads.txt -o /etc/unbound/blocklist/block-ads.txt
 curl -s  https://raw.githubusercontent.com/hagezi/dns-blocklists/main/hosts/light.txt -o /etc/unbound/blocklist/block-malware.txt
+curl -s -H "Authorization: token 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"  -L "https://raw.githubusercontent.com/desienkz-slp/DNS/refs/heads/main/block_mine.txt"   -o /etc/unbound/blocklist/block-mine.txt
 EOF
 sudo chmod +x /etc/unbound/blocklist/update-lists.sh
 sudo /etc/unbound/blocklist/update-lists.sh
@@ -101,6 +102,7 @@ cat <<EOF | sudo tee /etc/unbound/blocklist/gen-block.conf.sh
 # Sumber data
 ADS_SRC="/etc/unbound/blocklist/block-ads.txt"
 MAL_SRC="/etc/unbound/blocklist/block-malware.txt"
+ADS_SRC2="/etc/unbound/blocklist/block-mine.txt"
 
 # Output konfigurasi Unbound
 OUT="/etc/unbound/blocklist/ad-malware-block.conf"
@@ -122,6 +124,15 @@ grep '^||' "$ADS_SRC" \
   | grep -Ev '[^a-zA-Z0-9.-]' \
   | sort -u \
   | awk '{print "local-zone: \"" $1 "\" static"}' >> "$TMP"
+
+echo "🔁 Memproses daftar iklan (MINE format)..."
+grep '^||' "$ADS_SRC2" \
+  | sed -E 's/^\|\|([^\/\^$\*]+).*/\1/' \
+  | grep -Ev '^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$' \
+  | grep -Ev '[^a-zA-Z0-9.-]' \
+  | sort -u \
+  | awk '{print "local-zone: \"" $1 "\" static"}' >> "$TMP"
+
 
 echo "🔁 Memproses daftar malware (hosts format)..."
 grep -E '^(0\.0\.0\.0|127\.0\.0\.1)' "$MAL_SRC" \
@@ -171,70 +182,7 @@ sudo chmod +x /etc/unbound/blocklist/gen-adult-block.sh
 sudo /etc/unbound/blocklist/gen-adult-block.sh
 
 # === 6. Konfigurasi Unbound ===
-cat <<EOF | sudo tee /etc/unbound/unbound.conf
-server:
-  chroot: ""
-  interface: 0.0.0.0
-  port: 53
-  do-ip4: yes
-  do-ip6: no
-  do-udp: yes
-  do-tcp: yes
-  access-control: 0.0.0.0/0 allow
-  access-control: 192.168.168.0/24 allow
-  hide-identity: yes
-  hide-version: yes
-  prefetch: yes
-  cache-max-ttl: 86400
-  cache-min-ttl: 30
-  qname-minimisation: yes
-  log-queries: yes
-  log-replies: yes
-  statistics-interval: 0
-  extended-statistics: yes
-  use-syslog: yes
-  msg-cache-size: 1024m
-  rrset-cache-size: 2048m
-  key-cache-size: 512m
-  neg-cache-size: 512m
-  msg-cache-slabs: 8
-  rrset-cache-slabs: 8
-  key-cache-slabs: 8
-  infra-cache-slabs: 8
-  do-not-query-localhost: no
-  verbosity: 2
-
-  include: "/etc/unbound/blocklist/ad-malware-block.conf"
-  include: "/etc/unbound/blocklist/adult-redirect.conf"
-
-  # SafeSearch
-  local-zone: "www.google.com." redirect
-  local-data: "www.google.com. A 216.239.38.120"
-
-  local-zone: "www.bing.com." redirect
-  local-data: "www.bing.com. A 204.79.197.220"
-
-  # Reverse PTR agar hostname DNS muncul di NSLookup
-  local-zone: "20.18.172.in-addr.arpa." static
-  local-data: "11.20.18.172.in-addr.arpa. PTR dns.srnk."
-  local-data: "dns.srnk. A 172.18.20.11"
-
-  # Static A Records
-  local-data: "media.sornongko.net. A 172.18.20.240"
-  local-data: "isolir.sornongko.net. A 172.18.20.20"
-  local-data: "acs.sornongko.net. A 172.18.20.233"
-  local-data: "wa-gate.sornongko.net. A 172.18.20.241"
-
-remote-control:
-  control-enable: yes
-  control-use-cert: yes
-  control-interface: 127.0.0.1
-
-forward-zone:
-  name: "."
-  forward-addr: 127.0.0.1@5053
-  forward-addr: 127.0.0.1@5353
-EOF
+curl -s -H "Authorization: token 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"  -L "https://raw.githubusercontent.com/desienkz-slp/DNS/refs/heads/main/unbound.conf"   -o /etc/unbound/unbound.conf
 
 # === 7. Setup Remote Control Certificate ===
 sudo unbound-control-setup
