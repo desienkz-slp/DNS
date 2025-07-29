@@ -88,8 +88,8 @@ sudo wget  https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts -O /
 # Script auto-update blocklist
 cat <<EOF | sudo tee /etc/unbound/blocklist/update-lists.sh
 #!/bin/bash
-curl -s https://raw.githubusercontent.com/ABPindo/indonesianadblockrules/master/subscriptions/abpindo.txt -o /etc/unbound/blocklist/block-ads.txt
-curl -s  https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts -o /etc/unbound/blocklist/block-malware.txt
+curl -s https://raw.githubusercontent.com/hagezi/dns-blocklists/main/adblock/popupads.txt -o /etc/unbound/blocklist/block-ads.txt
+curl -s  https://raw.githubusercontent.com/hagezi/dns-blocklists/main/hosts/light.txt -o /etc/unbound/blocklist/block-malware.txt
 EOF
 sudo chmod +x /etc/unbound/blocklist/update-lists.sh
 sudo /etc/unbound/blocklist/update-lists.sh
