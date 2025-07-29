@@ -68,9 +68,7 @@ systemctl enable --now cloudflared-google.service
 mkdir -p /etc/unbound/blocklist
 cd /etc/unbound/blocklist
 
-curl -s -H "Authorization: token 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" \
-  -L "https://raw.githubusercontent.com/desienkz-slp/DNS/main/update-list.sh" \
-  -o /etc/unbound/blocklist/update-list.sh
+curl -s -H "Authorization: token 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" -L "https://raw.githubusercontent.com/desienkz-slp/DNS/main/update-list.sh" -o /etc/unbound/blocklist/update-list.sh
 
 chmod +x /etc/unbound/blocklist/update-list.sh
 /etc/unbound/blocklist/update-list.sh
