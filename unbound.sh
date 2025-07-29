@@ -68,7 +68,7 @@ systemctl enable --now cloudflared-google.service
 mkdir -p /etc/unbound/blocklist
 cd /etc/unbound/blocklist
 
-curl -s -H "Authorization: token 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" -L "https://raw.githubusercontent.com/desienkz-slp/DNS/main/update-list.sh" -o /etc/unbound/blocklist/update-list.sh
+curl -L https://raw.githubusercontent.com/desienkz-slp/DNS/refs/heads/main/update-lists.sh -o /etc/unbound/blocklist/update-list.sh
 
 chmod +x /etc/unbound/blocklist/update-list.sh
 /etc/unbound/blocklist/update-list.sh
@@ -149,9 +149,7 @@ chmod +x /etc/unbound/blocklist/gen-adult-block.sh
 /etc/unbound/blocklist/gen-adult-block.sh
 
 # === 6. Konfigurasi Unbound ===
-curl -s -H "Authorization: token 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" \
-  -L "https://raw.githubusercontent.com/desienkz-slp/DNS/main/unbound.conf" \
-  -o /etc/unbound/unbound.conf
+curl -L https://raw.githubusercontent.com/desienkz-slp/DNS/refs/heads/main/unbound.conf -o /etc/unbound/unbound.conf
 
 # === 7. Remote Control Certificate ===
 unbound-control-setup
