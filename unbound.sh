@@ -81,17 +81,8 @@ sudo systemctl enable --now cloudflared-google.service
 sudo mkdir -p /etc/unbound/blocklist
 cd /etc/unbound/blocklist
 
-# Download blocklist
-sudo wget https://raw.githubusercontent.com/hagezi/dns-blocklists/main/adblock/popupads.txt -O /etc/unbound/blocklist/block-ads.txt
-sudo wget https://raw.githubusercontent.com/hagezi/dns-blocklists/main/hosts/light.txt -O /etc/unbound/blocklist/block-malware.txt
-
 # Script auto-update blocklist
-cat <<EOF | sudo tee /etc/unbound/blocklist/update-lists.sh
-#!/bin/bash
-curl -s https://raw.githubusercontent.com/hagezi/dns-blocklists/main/adblock/popupads.txt -o /etc/unbound/blocklist/block-ads.txt
-curl -s  https://raw.githubusercontent.com/hagezi/dns-blocklists/main/hosts/light.txt -o /etc/unbound/blocklist/block-malware.txt
-curl -s -H "Authorization: token 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"  -L "https://raw.githubusercontent.com/desienkz-slp/DNS/refs/heads/main/block_mine.txt"   -o /etc/unbound/blocklist/block-mine.txt
-EOF
+curl -s -H "Authorization: token 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"  -L "https://raw.githubusercontent.com/desienkz-slp/DNS/refs/heads/main/update-list.sh"   -o /etc/unbound/blocklist/update-list.sh
 sudo chmod +x /etc/unbound/blocklist/update-lists.sh
 sudo /etc/unbound/blocklist/update-lists.sh
 
