@@ -141,10 +141,6 @@ while read domain; do
 done < /etc/unbound/blocklist/adult-domains.txt
 EOF
 
-cat <<EOF > /etc/unbound/blocklist/adult-domains.txt
-pornhub.com
-EOF
-
 chmod +x /etc/unbound/blocklist/gen-adult-block.sh
 bash /etc/unbound/blocklist/gen-adult-block.sh
 
