@@ -46,4 +46,13 @@ pastikan tampilan
 unbound_up 1
 ...
 ```
-https://saweria.co/widgets/qr?streamKey=525ce4591eb42670e8f8181eff1df3d0
+### ❤️ Dukung Proyek Ini
+
+Jika kamu merasa skrip ini bermanfaat, kamu bisa mendukung dengan donasi via Saweria:  
+<a href="https://saweria.co/desienkz" target="_blank">
+  <img src="https://saweria.co/widgets/qr?streamKey=525ce4591eb42670e8f8181eff1df3d0" width="200" alt="QR Saweria">
+</a>
+
+Atau klik tombol di bawah untuk donasi langsung:  
+[![Saweria](https://img.shields.io/badge/Donasi%20via-Saweria-orange?style=for-the-badge&logo=buymeacoffee)](https://saweria.co/desienkz)
+
