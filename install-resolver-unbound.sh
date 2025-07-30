@@ -9,60 +9,6 @@ apt update && apt install unbound curl wget -y
 
 # === 2. Install cloudflared ===
 wget https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64.deb
-dpkg -i cloudflared-linux-amd64.deb
-mkdir -p /etc/cloudflared
-
-# === 3. Konfigurasi cloudflared ===
-
-cat <<EOF > /etc/cloudflared/cloudflare-doh.yml
-proxy-dns: true
-proxy-dns-port: 5053
-upstream:
- - https://1.1.1.1/dns-query
- - https://1.0.0.1/dns-query
-EOF
-
-cat <<EOF > /etc/cloudflared/google-doh.yml
-proxy-dns: true
-proxy-dns-port: 5353
-upstream:
- - https://dns.google/dns-query
-EOF
-
-# === 4. Systemd cloudflared service ===
-
-cat <<EOF > /etc/systemd/system/cloudflared-cloudflare.service
-[Unit]
-Description=cloudflared DoH - Cloudflare
-After=network.target
-
-[Service]
-ExecStart=/usr/local/bin/cloudflared --config /etc/cloudflared/cloudflare-doh.yml
-Restart=on-failure
-RestartSec=5
-
-[Install]
-WantedBy=multi-user.target
-EOF
-
-cat <<EOF > /etc/systemd/system/cloudflared-google.service
-[Unit]
-Description=cloudflared DoH - Google
-After=network.target
-
-[Service]
-ExecStart=/usr/local/bin/cloudflared --config /etc/cloudflared/google-doh.yml
-Restart=on-failure
-RestartSec=5
-
-[Install]
-WantedBy=multi-user.target
-EOF
-
-systemctl daemon-reexec
-systemctl daemon-reload
-systemctl enable --now cloudflared-cloudflare.service
-systemctl enable --now cloudflared-google.service
 
 # === 5. Siapkan Blocklist ===
 mkdir -p /etc/unbound/blocklist
