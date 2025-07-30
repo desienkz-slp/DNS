@@ -15,6 +15,7 @@ systemctl disable cloudflared 2>/dev/null
 apt purge --autoremove unbound -y
 
 # === 4. Hapus konfigurasi dan direktori terkait ===
+rm -rf /var/lib/unbound/
 rm -rf /etc/unbound/
 rm -f /usr/local/bin/cloudflared
 rm -rf /etc/cloudflared/
