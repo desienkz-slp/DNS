@@ -6,10 +6,10 @@ CONFIG_PATH="/etc/promtail"
 CONFIG_FILE="$CONFIG_PATH/config.yaml"
 POSITION_FILE="/var/log/positions-unbound.yaml"
 UNBOUND_LOG="/var/log/unbound/unbound.log"
-
+https://github.com/grafana/loki/releases/download/v3.5.3/promtail-linux-arm64.zip
 # === 1. Unduh dan install Promtail ===
 cd /tmp
-wget -q https://github.com/grafana/loki/releases/download/v${PROMTAIL_VERSION}/promtail-linux-amd64.zip
+wget https://github.com/grafana/loki/releases/download/v${PROMTAIL_VERSION}/promtail-linux-amd64.zip
 unzip -o promtail-linux-amd64.zip
 chmod +x promtail-linux-amd64
 mv -f promtail-linux-amd64 /usr/local/bin/promtail
