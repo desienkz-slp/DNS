@@ -46,3 +46,4 @@ pastikan tampilan
 unbound_up 1
 ...
 ```
+https://saweria.co/widgets/qr?streamKey=525ce4591eb42670e8f8181eff1df3d0
