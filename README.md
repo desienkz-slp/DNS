@@ -46,13 +46,13 @@ pastikan tampilan
 unbound_up 1
 ...
 ```
-### ❤️ Dukung Proyek Ini
+❤️ Dukung Proyek Ini
+Open-source butuh waktu dan energi. Jika kamu merasa skrip ini membantu, kamu bisa mendukung saya:
 
-Jika kamu merasa skrip ini bermanfaat, kamu bisa mendukung dengan donasi via Saweria:  
-<a href="https://saweria.co/desienkz" target="_blank">
-  <img src="https://saweria.co/widgets/qr?streamKey=525ce4591eb42670e8f8181eff1df3d0" width="200" alt="QR Saweria">
-</a>
+📱 Scan QR di bawah untuk donasi via Saweria:
 
-Atau klik tombol di bawah untuk donasi langsung:  
-[![Saweria](https://img.shields.io/badge/Donasi%20via-Saweria-orange?style=for-the-badge&logo=buymeacoffee)](https://saweria.co/desienkz)
+<p align="center"> <img src="https://saweria.co/widgets/qr?streamKey=525ce4591eb42670e8f8181eff1df3d0" width="200" alt="QR Saweria"> </p>
+Atau klik tombol di bawah ini:
+
+<p align="center"> <a href="https://saweria.co/desienkz" target="_blank"> <img src="https://img.shields.io/badge/Donasi%20via-Saweria-orange?style=for-the-badge&logo=buymeacoffee" alt="Donasi via Saweria"> </a> </p>
 
