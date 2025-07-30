@@ -89,6 +89,8 @@ EOF
 chmod +x /etc/unbound/blocklist/gen-adult-block.sh
 bash /etc/unbound/blocklist/gen-adult-block.sh
 
+curl -L https://raw.githubusercontent.com/desienkz-slp/DNS/refs/heads/main/domain-insecure.conf -o /etc/unbound/unbound.conf.d/domain-insecure.conf
+
 echo  " === 3. Konfigurasi Unbound resolver  === "
 curl -L https://raw.githubusercontent.com/desienkz-slp/DNS/refs/heads/main/resolver-unbound.conf -o /etc/unbound/unbound.conf
 
