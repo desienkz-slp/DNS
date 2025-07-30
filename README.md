@@ -1,14 +1,30 @@
-List isi setting
+# 🧠 DNS Resolver Installer with Unbound + Exporter + Promtail
 
-  1. redirect adult 172.18.20.234
-  2. hostname ip dns 172.18.20.x
-  3. local-data: "media.sornongko.net. A 172.18.20.240"
-  4. local-data: "isolir.sornongko.net. A 172.18.20.20"
-  5. local-data: "acs.sornongko.net. A 172.18.20.233"
-  6. local-data: "wa-gate.sornongko.net. A 172.18.20.241"
-  7. port unbound 9168
+Script otomatis untuk menginstalasi **Unbound DNS Resolver**, **Unbound Exporter** (untuk Prometheus), dan **Promtail** (untuk Grafana Loki) dalam satu langkah praktis.
 
-===sebagai resolver===
-wget -O /var/lib/unbound/root.hints https://www.internic.net/domain/named.cache
+---
 
-unbound-anchor -a /var/lib/unbound/root.key
+## 📦 Komponen yang Diinstal
+
+| Komponen         | Deskripsi                                                                 |
+|------------------|---------------------------------------------------------------------------|
+| **Unbound**       | DNS Resolver Recursive lokal yang aman dan cepat.                        |
+| **Unbound Exporter** | Monitoring DNS metrics via Prometheus.                                   |
+| **Promtail**       | Mengirim log Unbound ke Grafana Loki.                                   |
+
+---
+
+
+Jika kamu ingin pakai versi **dengan tombol Copy otomatis** saat dibuka di GitHub Pages atau dokumentasi berbasis HTML (misalnya pakai [Docsify](https://docsify.js.org) atau [MkDocs](https://www.mkdocs.org/)), kamu bisa pakai HTML di bawah:
+
+```html
+<h3>🛠️ Instalasi Cepat</h3>
+<p>Jalankan perintah di bawah ini di terminal:</p>
+
+<pre>
+<code class="language-bash">
+wget https://raw.githubusercontent.com/desienkz-slp/DNS/main/unbound-exporter-promtail.sh
+chmod +x unbound-exporter-promtail.sh
+sudo ./unbound-exporter-promtail.sh
+</code>
+</pre>
