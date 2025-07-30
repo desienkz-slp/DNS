@@ -4,13 +4,12 @@
 #  SETUP UNBOUND DNS RESOLVER + DoH + FILTERING
 # ===============================================
 
-# === 1. Install Unbound & Tools ===
+echo " === 1. Install Unbound & Tools ===  "
 apt update && apt install unbound curl wget -y
+wget -O /var/lib/unbound/root.hints https://www.internic.net/domain/named.cache
+unbound-anchor -a /var/lib/unbound/root.key
 
-# === 2. Install cloudflared ===
-wget https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64.deb
-
-# === 5. Siapkan Blocklist ===
+echo " === 2. Siapkan Blocklist ===  "
 mkdir -p /etc/unbound/blocklist
 cd /etc/unbound/blocklist
 
@@ -90,10 +89,10 @@ EOF
 chmod +x /etc/unbound/blocklist/gen-adult-block.sh
 bash /etc/unbound/blocklist/gen-adult-block.sh
 
-# === 6. Konfigurasi Unbound ===
+echo  " === 3. Konfigurasi Unbound resolver  === "
 curl -L https://raw.githubusercontent.com/desienkz-slp/DNS/refs/heads/main/resolver-unbound.conf -o /etc/unbound/unbound.conf
 
-# === 7. Remote Control Certificate ===
+echo " === 4. Remote Control Certificate === "
 unbound-control-setup
 
 rm /etc/resolv.conf
@@ -102,14 +101,14 @@ ln -s /run/systemd/resolve/resolv.conf /etc/resolv.conf
 systemctl stop systemd-resolved
 systemctl disable systemd-resolved
 
-# === 8. Aktifkan Unbound ===
+echo "=== 5. Aktifkan Unbound ==="
 systemctl restart unbound
 systemctl enable unbound
 
-# === 9. Cronjob untuk auto-update blocklist ===
+echo "=== 6. Cronjob untuk auto-update blocklist ==="
 (crontab -l 2>/dev/null; echo "0 3 * * * /etc/unbound/blocklist/update-list.sh && /etc/unbound/blocklist/gen-block.conf.sh && /etc/unbound/blocklist/gen-adult-block.sh && systemctl restart unbound") | crontab -
 
-# === 10. Statistik Cache ===
+echo "=== 7. Statistik Cache ==="
 echo "📊 Gunakan: unbound-control stats_noreset | grep -E 'cache.*hits|cache.*misses'"
 echo "📈 Semua statistik: unbound-control stats"
 echo "📜 Log: journalctl -u unbound -f"
