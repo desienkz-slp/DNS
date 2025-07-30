@@ -7,7 +7,7 @@ VERSION="3.5.3"
 ARCH="amd64"
 
 echo "=== Mengunduh Promtail v$VERSION untuk $ARCH ==="
-wget -q https://github.com/grafana/loki/releases/download/v${VERSION}/promtail-linux-${ARCH}.zip -O promtail.zip
+wget https://github.com/grafana/loki/releases/download/v${VERSION}/promtail-linux-${ARCH}.zip -O promtail.zip
 
 echo "=== Mengekstrak file ==="
 unzip -o promtail.zip
