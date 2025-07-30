@@ -111,11 +111,6 @@ set -e
 
 echo "🛡️  Menambahkan izin AppArmor untuk Unbound..."
 
-# 1. Buat direktori dan file log
-mkdir -p /var/log/unbound
-touch /var/log/unbound/unbound.log
-chown unbound:unbound /var/log/unbound/unbound.log
-
 # 2. Tambahkan rule ke override profile
 APPARMOR_LOCAL="/etc/apparmor.d/local/usr.sbin.unbound"
 
