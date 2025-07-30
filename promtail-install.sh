@@ -6,6 +6,7 @@ set -e
 VERSION="3.5.3"
 ARCH="amd64"
 
+apt install unzip -y
 echo "=== Mengunduh Promtail v$VERSION untuk $ARCH ==="
 wget https://github.com/grafana/loki/releases/download/v${VERSION}/promtail-linux-${ARCH}.zip -O promtail.zip
 
