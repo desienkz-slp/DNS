@@ -101,6 +101,49 @@ ln -s /run/systemd/resolve/resolv.conf /etc/resolv.conf
 systemctl stop systemd-resolved
 systemctl disable systemd-resolved
 
+echo "aktifkan log"
+mkdir -p /var/log/unbound
+touch /var/log/unbound/unbound.log
+chown unbound:unbound /var/log/unbound/unbound.log
+
+#========
+set -e
+
+echo "🛡️  Menambahkan izin AppArmor untuk Unbound..."
+
+# 1. Buat direktori dan file log
+mkdir -p /var/log/unbound
+touch /var/log/unbound/unbound.log
+chown unbound:unbound /var/log/unbound/unbound.log
+
+# 2. Tambahkan rule ke override profile
+APPARMOR_LOCAL="/etc/apparmor.d/local/usr.sbin.unbound"
+
+mkdir -p "$(dirname "$APPARMOR_LOCAL")"
+
+if ! grep -q "/var/log/unbound/" "$APPARMOR_LOCAL"; then
+  cat <<'EOF' >> "$APPARMOR_LOCAL"
+/var/log/unbound/ rw,
+/var/log/unbound/** rwk,
+EOF
+
+  echo "✅ Rule AppArmor ditambahkan ke $APPARMOR_LOCAL"
+else
+  echo "ℹ️  Rule sudah ada di $APPARMOR_LOCAL"
+fi
+
+# 3. Reload profil AppArmor
+echo "🔁 Reload AppArmor profile..."
+apparmor_parser -r /etc/apparmor.d/usr.sbin.unbound
+
+# 4. Restart unbound (opsional)
+echo "🔄 Restart Unbound service..."
+systemctl restart unbound
+
+echo "✅ Selesai! Periksa log di /var/log/unbound/unbound.log"
+
+#========
+
 echo "=== 5. Aktifkan Unbound ==="
 systemctl restart unbound
 systemctl enable unbound
