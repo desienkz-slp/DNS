@@ -49,10 +49,7 @@ unbound_up 1
 ❤️ Dukung Proyek Ini
 Open-source butuh waktu dan energi. Jika kamu merasa skrip ini membantu, kamu bisa mendukung saya:
 
-📱 Scan QR di bawah untuk donasi via Saweria:
-
-<p align="center"> <img src="https://saweria.co/widgets/qr?streamKey=525ce4591eb42670e8f8181eff1df3d0" width="200" alt="QR Saweria"> </p>
-Atau klik tombol di bawah ini:
+klik tombol di bawah ini:
 
 <p align="center"> <a href="https://saweria.co/desienkz" target="_blank"> <img src="https://img.shields.io/badge/Donasi%20via-Saweria-orange?style=for-the-badge&logo=buymeacoffee" alt="Donasi via Saweria"> </a> </p>
 
