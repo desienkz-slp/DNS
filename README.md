@@ -9,11 +9,13 @@ Script otomatis untuk menginstalasi **Unbound DNS Resolver**, **Unbound Exporter
 | Komponen         | Deskripsi                                                                 |
 |------------------|---------------------------------------------------------------------------|
 | **Unbound**       | DNS Resolver Recursive lokal yang aman dan cepat.                        |
-| **Unbound Exporter** | Monitoring DNS metrics via Prometheus.                                   |
+| **Unbound Exporter** | Monitoring DNS metrics via Prometheus.                                |
 | **Promtail**       | Mengirim log Unbound ke Grafana Loki.                                   |
 
 ---
-
+Butuh penyesuaian untuk
+1. server loki
+2. server redirect block adult
 
 Jika kamu ingin pakai versi **dengan tombol Copy otomatis** saat dibuka di GitHub Pages atau dokumentasi berbasis HTML (misalnya pakai [Docsify](https://docsify.js.org) atau [MkDocs](https://www.mkdocs.org/)), kamu bisa pakai HTML di bawah:
 
