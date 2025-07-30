@@ -14,7 +14,7 @@ mkdir -p /etc/cloudflared
 
 # === 3. Konfigurasi cloudflared ===
 
-cat <<EOF > /etc/cloudflared/cloudflare-doh.yml
+cat <<'EOF' > /etc/cloudflared/cloudflare-doh.yml
 proxy-dns: true
 proxy-dns-port: 5053
 upstream:
@@ -22,7 +22,7 @@ upstream:
  - https://1.0.0.1/dns-query
 EOF
 
-cat <<EOF > /etc/cloudflared/google-doh.yml
+cat <<'EOF' > /etc/cloudflared/google-doh.yml
 proxy-dns: true
 proxy-dns-port: 5353
 upstream:
@@ -31,7 +31,7 @@ EOF
 
 # === 4. Systemd cloudflared service ===
 
-cat <<EOF > /etc/systemd/system/cloudflared-cloudflare.service
+cat <<'EOF' > /etc/systemd/system/cloudflared-cloudflare.service
 [Unit]
 Description=cloudflared DoH - Cloudflare
 After=network.target
@@ -45,7 +45,7 @@ RestartSec=5
 WantedBy=multi-user.target
 EOF
 
-cat <<EOF > /etc/systemd/system/cloudflared-google.service
+cat <<'EOF' > /etc/systemd/system/cloudflared-google.service
 [Unit]
 Description=cloudflared DoH - Google
 After=network.target
@@ -74,7 +74,6 @@ chmod +x /etc/unbound/blocklist/update-list.sh
 bash /etc/unbound/blocklist/update-list.sh
 
 cat <<'EOF' > /etc/unbound/blocklist/gen-block.conf.sh
-#!/bin/bash
 ADS_SRC="/etc/unbound/blocklist/block-ads.txt"
 MAL_SRC="/etc/unbound/blocklist/block-malware.txt"
 ADS_SRC2="/etc/unbound/blocklist/block-mine.txt"
@@ -155,6 +154,87 @@ ln -s /run/systemd/resolve/resolv.conf /etc/resolv.conf
 
 systemctl stop systemd-resolved
 systemctl disable systemd-resolved
+
+echo "aktifkan log"
+mkdir -p /var/log/unbound
+touch /var/log/unbound/unbound.log
+chown unbound:unbound /var/log/unbound/unbound.log
+
+#========
+set -e
+
+echo "🛡️  Menambahkan izin AppArmor untuk Unbound..."
+
+# 2. Tambahkan rule ke override profile
+APPARMOR_LOCAL="/etc/apparmor.d/local/usr.sbin.unbound"
+
+mkdir -p "$(dirname "$APPARMOR_LOCAL")"
+
+if ! grep -q "/var/log/unbound/" "$APPARMOR_LOCAL"; then
+  cat <<'EOF' >> "$APPARMOR_LOCAL"
+/var/log/unbound/ rw,
+/var/log/unbound/** rwk,
+EOF
+
+  echo "✅ Rule AppArmor ditambahkan ke $APPARMOR_LOCAL"
+else
+  echo "ℹ️  Rule sudah ada di $APPARMOR_LOCAL"
+fi
+
+# 3. Reload profil AppArmor
+echo "🔁 Reload AppArmor profile..."
+apparmor_parser -r /etc/apparmor.d/usr.sbin.unbound
+
+# 4. Restart unbound (opsional)
+echo "🔄 Restart Unbound service..."
+systemctl restart unbound
+
+echo "✅ Selesai! Periksa log di /var/log/unbound/unbound.log"
+
+#========
+
+
+#=======
+set -e
+
+LOGROTATE_FILE="/etc/logrotate.d/unbound"
+
+echo "📝 Membuat konfigurasi logrotate untuk Unbound..."
+
+# Cek apakah file sudah ada
+if [ -f "$LOGROTATE_FILE" ]; then
+  echo "⚠️  File logrotate sudah ada di $LOGROTATE_FILE, tidak diubah."
+  exit 1
+fi
+
+# Buat file konfigurasi logrotate
+cat <<'EOF' > "$LOGROTATE_FILE"
+/var/log/unbound/unbound.log {
+    daily
+    rotate 7
+    compress
+    delaycompress
+    missingok
+    notifempty
+    create 640 unbound unbound
+    postrotate
+        systemctl restart unbound > /dev/null 2>&1 || true
+    endscript
+}
+EOF
+
+echo "✅ Logrotate Unbound berhasil dibuat di $LOGROTATE_FILE"
+
+# Tampilkan isi konfigurasi
+echo "📂 Konfigurasi logrotate:"
+cat "$LOGROTATE_FILE"
+
+# Uji coba rotasi manual
+echo "🔄 Uji coba rotasi log secara manual..."
+logrotate -f "$LOGROTATE_FILE"
+
+echo "✅ Selesai! Cek file di /var/log/unbound/"
+
 
 # === 8. Aktifkan Unbound ===
 systemctl restart unbound
