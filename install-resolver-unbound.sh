@@ -139,9 +139,6 @@ echo "✅ Selesai! Periksa log di /var/log/unbound/unbound.log"
 
 #========
 
-echo "=== 5. Aktifkan Unbound ==="
-systemctl restart unbound
-systemctl enable unbound
 
 #=======
 set -e
@@ -186,8 +183,13 @@ echo "✅ Selesai! Cek file di /var/log/unbound/"
 
 #=======
 
+echo "=== 5. Aktifkan Unbound ==="
+systemctl restart unbound
+systemctl enable unbound
+
 echo "=== 6. Cronjob untuk auto-update blocklist ==="
 (crontab -l 2>/dev/null; echo "0 3 * * * /etc/unbound/blocklist/update-list.sh && /etc/unbound/blocklist/gen-block.conf.sh && /etc/unbound/blocklist/gen-adult-block.sh && systemctl restart unbound") | crontab -
+(crontab -l 2>/dev/null; echo "0 2 */3 * * /usr/local/bin/update-unbound-roothints.sh >> /var/log/unbound/update-roothints.log 2>&1") | crontab -
 
 echo "=== 7. Statistik Cache ==="
 echo "📊 Gunakan: unbound-control stats_noreset | grep -E 'cache.*hits|cache.*misses'"
