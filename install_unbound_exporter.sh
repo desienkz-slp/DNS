@@ -1,28 +1,52 @@
 #!/bin/bash
 
-set -e
+set -euo pipefail
 
-# === 1. Install GO versi terbaru ===
-echo "[INFO] Downloading latest Go..."
-GO_VERSION=$(curl -s https://go.dev/VERSION?m=text)
-wget -q https://go.dev/dl/${GO_VERSION}.linux-amd64.tar.gz -O /tmp/go.tar.gz
+GO_VERSION="1.24.5"
+GO_TAR="go${GO_VERSION}.linux-amd64.tar.gz"
+GO_URL="https://go.dev/dl/${GO_TAR}"
+INSTALL_DIR="/usr/local"
+PROFILE_FILE="/etc/profile.d/go.sh"
+GOBIN="/root/go/bin"
 
-echo "[INFO] Installing Go to /usr/local..."
-rm -rf /usr/local/go
-tar -C /usr/local -xzf /tmp/go.tar.gz
+log() {
+  echo -e "[INFO] $1"
+}
 
-# Set PATH
-echo "[INFO] Setting PATH for Go..."
-export PATH=$PATH:/usr/local/go/bin
-echo 'export PATH=$PATH:/usr/local/go/bin:/root/go/bin' >> ~/.bashrc
-source ~/.bashrc
+# === 0. Harus dijalankan sebagai root ===
+if [[ $EUID -ne 0 ]]; then
+  echo "[ERROR] Skrip ini harus dijalankan sebagai root. Gunakan: sudo $0"
+  exit 1
+fi
 
-# === 2. Install unbound_exporter ===
-echo "[INFO] Installing unbound_exporter..."
-/usr/local/go/bin/go install github.com/letsencrypt/unbound_exporter@latest
+# === 1. Install Go ===
+log "Menghapus instalasi Go sebelumnya..."
+rm -rf ${INSTALL_DIR}/go /root/go /home/*/go
 
-# === 3. Create systemd service ===
-echo "[INFO] Creating systemd service..."
+log "Mengunduh Go ${GO_VERSION} dari ${GO_URL}..."
+wget -q --show-progress ${GO_URL}
+
+log "Mengekstrak Go ke ${INSTALL_DIR}..."
+tar -C ${INSTALL_DIR} -xzf ${GO_TAR}
+rm -f ${GO_TAR}
+
+log "Menambahkan PATH Go ke ${PROFILE_FILE}..."
+cat <<EOF > ${PROFILE_FILE}
+export PATH=\$PATH:/usr/local/go/bin
+EOF
+chmod 644 ${PROFILE_FILE}
+source ${PROFILE_FILE}
+
+# === 2. Verifikasi Go ===
+log "Verifikasi instalasi Go..."
+go version || { echo "[ERROR] Go tidak berhasil diinstal."; exit 1; }
+
+# === 3. Install unbound_exporter ===
+log "Menginstall unbound_exporter..."
+go install github.com/letsencrypt/unbound_exporter@latest
+
+# === 4. Buat systemd service ===
+log "Membuat systemd service untuk unbound_exporter..."
 cat <<EOF > /etc/systemd/system/unbound_exporter.service
 [Unit]
 Description=Unbound Exporter (tanpa TLS)
@@ -30,7 +54,7 @@ After=network.target
 
 [Service]
 User=root
-ExecStart=/root/go/bin/unbound_exporter \\
+ExecStart=${GOBIN}/unbound_exporter \\
   -unbound.host=tcp://127.0.0.1:8953 \\
   -unbound.key="" \\
   -unbound.cert="" \\
@@ -41,10 +65,9 @@ Restart=always
 WantedBy=multi-user.target
 EOF
 
-# === 4. Reload & Start ===
-echo "[INFO] Enabling and starting service..."
-systemctl daemon-reexec
+# === 5. Jalankan service ===
+log "Menjalankan dan mengaktifkan unbound_exporter..."
 systemctl daemon-reload
 systemctl enable --now unbound_exporter
 
-echo "[DONE] unbound_exporter installed and running at http://localhost:9167/metrics"
+log "[✅ SELESAI] unbound_exporter aktif di http://localhost:9167/metrics"
