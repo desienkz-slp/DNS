@@ -143,6 +143,49 @@ echo "=== 5. Aktifkan Unbound ==="
 systemctl restart unbound
 systemctl enable unbound
 
+#=======
+set -e
+
+LOGROTATE_FILE="/etc/logrotate.d/unbound"
+
+echo "📝 Membuat konfigurasi logrotate untuk Unbound..."
+
+# Cek apakah file sudah ada
+if [ -f "$LOGROTATE_FILE" ]; then
+  echo "⚠️  File logrotate sudah ada di $LOGROTATE_FILE, tidak diubah."
+  exit 1
+fi
+
+# Buat file konfigurasi logrotate
+cat <<'EOF' > "$LOGROTATE_FILE"
+/var/log/unbound/unbound.log {
+    daily
+    rotate 7
+    compress
+    delaycompress
+    missingok
+    notifempty
+    create 640 unbound unbound
+    postrotate
+        systemctl restart unbound > /dev/null 2>&1 || true
+    endscript
+}
+EOF
+
+echo "✅ Logrotate Unbound berhasil dibuat di $LOGROTATE_FILE"
+
+# Tampilkan isi konfigurasi
+echo "📂 Konfigurasi logrotate:"
+cat "$LOGROTATE_FILE"
+
+# Uji coba rotasi manual
+echo "🔄 Uji coba rotasi log secara manual..."
+logrotate -f "$LOGROTATE_FILE"
+
+echo "✅ Selesai! Cek file di /var/log/unbound/"
+
+#=======
+
 echo "=== 6. Cronjob untuk auto-update blocklist ==="
 (crontab -l 2>/dev/null; echo "0 3 * * * /etc/unbound/blocklist/update-list.sh && /etc/unbound/blocklist/gen-block.conf.sh && /etc/unbound/blocklist/gen-adult-block.sh && systemctl restart unbound") | crontab -
 
