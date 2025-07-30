@@ -19,14 +19,30 @@ Butuh penyesuaian untuk
 
 Jika kamu ingin pakai versi **dengan tombol Copy otomatis** saat dibuka di GitHub Pages atau dokumentasi berbasis HTML (misalnya pakai [Docsify](https://docsify.js.org) atau [MkDocs](https://www.mkdocs.org/)), kamu bisa pakai HTML di bawah:
 
-```html
-<h3>🛠️ Instalasi Cepat</h3>
-<p>Jalankan perintah di bawah ini di terminal:</p>
 
-<pre>
-<code class="language-bash">
+<h3>untuk menjalankan instalasi otomatis</h3>
+
+```html
 wget https://raw.githubusercontent.com/desienkz-slp/DNS/main/unbound-exporter-promtail.sh
 chmod +x unbound-exporter-promtail.sh
 sudo ./unbound-exporter-promtail.sh
-</code>
-</pre>
+```
+<h3>cek promtail</h3>
+
+```html
+sudo journalctl -u promtail -f
+```
+
+<h3>cek unbound_exporter</h3>
+
+```html
+curl http://localhost:9167/metrics
+```
+pastikan tampilan
+
+```
+# HELP unbound_up Was the last query of unbound successful.
+# TYPE unbound_up gauge
+unbound_up 1
+...
+```
