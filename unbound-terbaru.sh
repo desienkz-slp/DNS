@@ -7,6 +7,7 @@
 echo "=== 1. Install Unbound & Tools (Build dari source terbaru) ==="
 apt update
 apt install -y build-essential libssl-dev libexpat1-dev libevent-dev curl wget
+apt install unbound -y
 
 # Download dan compile Unbound 1.23.1
 cd /usr/local/src
@@ -20,6 +21,14 @@ make install
 # Pastikan binary baru dikenali
 ln -sf /usr/local/sbin/unbound /usr/sbin/unbound
 ln -sf /usr/local/sbin/unbound-anchor /usr/sbin/unbound-anchor
+mkdir -p /var/lib/unbound
+chown unbound:unbound /var/lib/unbound
+chmod 755 /var/lib/unbound
+mkdir -p /var/log/unbound
+touch /var/log/unbound/unbound.log
+chown -R unbound:unbound /var/log/unbound
+chmod 640 /var/log/unbound/unbound.log
+
 
 # Setup root hints & trust anchor
 curl -o /var/lib/unbound/root.hints https://www.internic.net/domain/named.cache
