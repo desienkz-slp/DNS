@@ -1,3 +1,4 @@
+@@||doubleclick.net^
 @@||googleadservices.com^
 @@||wa.me^
-@@||doubleclick.net^
+
